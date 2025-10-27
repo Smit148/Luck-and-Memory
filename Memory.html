@@ -1,0 +1,153 @@
+<!-- first 10 seconds cards are reveled to remeber -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memory Game</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <style>
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 10px;
+      margin: 20px auto;
+      width: max-content;
+    }
+
+    .card {
+      width: 100px;
+      height: 120px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      border-radius: 8px;
+    }
+
+    .card-front {
+      background: #4b5563;
+      /* hidden side */
+    }
+
+    .card-back {
+      background: gold;
+      /* visible side */
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Score: <span id="score">0</span></h2>
+  <div id="game-board"></div>
+  <a href="Index.html" style="align-self: center;"> <button class="btn btn-success"> Main Menu </button> </a>
+
+  <script>
+    // Use emoji instead of numbers
+    const cardValues = ['🍎', '🍎', '🍌', '🍌', '🍇', '🍇', '🍒', '🍒', '🍍', '🍍', '🥝', '🥝', '🍉', '🍉', '🍑', '🍑'];
+
+    // Shuffle array
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Create game board
+    const gameBoard = document.getElementById('game-board');
+    let shuffledCards = shuffle([...cardValues]);
+    shuffledCards.forEach(value => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.innerHTML = `
+        <div border="none" class="card-inner">
+          <div class="card-front"></div>
+          <div class="card-back">${value}</div>
+        </div>
+      `;
+      card.addEventListener('click', () => flipCard(card, value));
+      gameBoard.appendChild(card);
+    });
+
+    // Flip card logic
+    let flippedCards = [];
+    let score = 0;
+    function flipCard(card, value) {
+      if (flippedCards.length < 2 && !card.classList.contains('flipped')) {
+        card.classList.add('flipped');
+        flippedCards.push({ card, value });
+        if (flippedCards.length === 2) {
+          checkMatch();
+        }
+      }
+    }
+
+    // End Message
+
+
+    // Check if cards match
+    function checkMatch() {
+      const [card1, card2] = flippedCards;
+      if (card1.value === card2.value) {
+        score = score + 10;
+        document.getElementById('score').textContent = score;
+        flippedCards = [];
+        /*if (score === 80)
+        {
+          return
+          const suui = document.createElement('div');
+          suui.classList.add('suui');
+          suui.innerHTML =
+            `
+          <div class="alert alert-success" role="alert">
+             <h4 class="alert-heading">Well done!</h4>
+            <p> "Congrats, Tile Master! The tiles never saw it coming. 🧱💥" </p>
+            <hr>
+            <button type="button" class="btn btn-success"> Return to Main Menu </button>
+          </div>
+          `;
+          }*/
+        }
+      else {
+        setTimeout(() => {
+          card1.card.classList.remove('flipped');
+          card2.card.classList.remove('flipped');
+          flippedCards = [];
+        }, 1000);
+      }
+    }
+
+    
+
+  </script>
+</body>
+
+</html>
